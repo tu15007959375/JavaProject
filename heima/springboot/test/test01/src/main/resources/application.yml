@@ -1,0 +1,25 @@
+#server.port=80
+#spring.main.banner-mode=off
+#logging.level.root = error
+server:
+  port: 80
+#  作为访问地址的前缀:localhost://tjx/books
+#  servlet:
+#    context-path: /tjx
+
+country: jiangxi
+user:
+  name: tujinxing
+  age: 23
+
+likes:
+  - game
+  - music
+
+base: Tu
+
+name1: ${base}Jinxing
+
+datasouce:
+  driver: com.mysql
+  username: root
