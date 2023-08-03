@@ -20,15 +20,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="springboot_19_cache" target="1.8" />
-      <module name="SSMP" target="1.8" />
-      <module name="test01" target="1.8" />
-      <module name="test02" target="1.8" />
-      <module name="test03_mybatisplus" target="1.8" />
-      <module name="test04_configuration" target="1.8" />
-      <module name="test05_test" target="1.8" />
-      <module name="test06_redis" target="1.8" />
       <module name="test07_mongdb" target="1.8" />
-      <module name="test08_cache" target="1.8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

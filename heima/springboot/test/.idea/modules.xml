@@ -2,15 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/SSMP/SSMP.iml" filepath="$PROJECT_DIR$/SSMP/SSMP.iml" />
-      <module fileurl="file://$PROJECT_DIR$/test01/test01.iml" filepath="$PROJECT_DIR$/test01/test01.iml" />
-      <module fileurl="file://$PROJECT_DIR$/test02/test02.iml" filepath="$PROJECT_DIR$/test02/test02.iml" />
-      <module fileurl="file://$PROJECT_DIR$/test03_mybatisplus/test03_mybatisplus.iml" filepath="$PROJECT_DIR$/test03_mybatisplus/test03_mybatisplus.iml" />
-      <module fileurl="file://$PROJECT_DIR$/test04_configuration/test04_configuration.iml" filepath="$PROJECT_DIR$/test04_configuration/test04_configuration.iml" />
-      <module fileurl="file://$PROJECT_DIR$/test05_test/test05_test.iml" filepath="$PROJECT_DIR$/test05_test/test05_test.iml" />
-      <module fileurl="file://$PROJECT_DIR$/test06_redis/test06_redis.iml" filepath="$PROJECT_DIR$/test06_redis/test06_redis.iml" />
       <module fileurl="file://$PROJECT_DIR$/test_mongodb/test07_mongdb.iml" filepath="$PROJECT_DIR$/test_mongodb/test07_mongdb.iml" />
-      <module fileurl="file://$PROJECT_DIR$/test08_cache/test08_cache.iml" filepath="$PROJECT_DIR$/test08_cache/test08_cache.iml" />
     </modules>
   </component>
 </project>
