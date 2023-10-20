@@ -126,3 +126,4 @@
 127.0.0.1 - - [19/Oct/2023:21:10:59 +0800] "GET /api/employee/page?page=1&pageSize=10 HTTP/1.1" 200 1090 "http://localhost/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"
 127.0.0.1 - - [19/Oct/2023:21:11:06 +0800] "POST /api/employee/status/1?id=5 HTTP/1.1" 200 44 "http://localhost/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"
 127.0.0.1 - - [19/Oct/2023:21:11:06 +0800] "GET /api/employee/page?page=1&pageSize=10 HTTP/1.1" 200 1090 "http://localhost/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"
+127.0.0.1 - - [19/Oct/2023:21:14:00 +0800] "GET /flowStatistics HTTP/1.1" 404 153 "-" "-"
