@@ -337,3 +337,4 @@
 127.0.0.1 - - [21/Oct/2023:16:33:35 +0800] "DELETE /api/dish?ids=69,68 HTTP/1.1" 200 72 "http://localhost/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"
 127.0.0.1 - - [21/Oct/2023:16:34:04 +0800] "DELETE /api/dish?ids=69,68 HTTP/1.1" 200 72 "http://localhost/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"
 127.0.0.1 - - [21/Oct/2023:16:34:24 +0800] "POST /api/dish/status/0?id=69 HTTP/1.1" 404 101 "http://localhost/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"
+127.0.0.1 - - [21/Oct/2023:16:35:28 +0800] "GET /flowStatistics HTTP/1.1" 404 153 "-" "-"
