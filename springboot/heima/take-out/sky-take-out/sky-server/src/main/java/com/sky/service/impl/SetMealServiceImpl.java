@@ -70,4 +70,21 @@ public class SetMealServiceImpl implements SetMealService {
         Page<SetmealVO> page = setmealMapper.page(setmealPageQueryDTO);
         return new PageResult(page.getTotal(), page.getResult());
     }
+
+    /**
+     * 批量删除套餐
+     * @param ids
+     */
+    @Override
+    public void deleteBatch(List<Long> ids) {
+        //判断是否起售中
+        for (Long id : ids) {
+            Setmeal setmeal = setmealMapper.getById(id);
+            if(setmeal.getStatus() == StatusConstant.ENABLE){
+                throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
+            }
+        }
+        setmealMapper.deleteBatch(ids);
+        setmealDishMapper.deleteBatch(ids);
+    }
 }
