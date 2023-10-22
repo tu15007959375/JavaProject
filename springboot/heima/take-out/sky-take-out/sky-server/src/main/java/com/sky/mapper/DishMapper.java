@@ -9,6 +9,7 @@ import com.sky.vo.DishVO;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -65,4 +66,16 @@ public interface DishMapper {
      */
     @AutoFill(OperationType.UPDATE)
     void update(Dish dish);
+
+    /**
+     * 根据分类ID查询菜品
+     *
+     * @param categoryId
+     * @param enable
+     * @return
+     */
+    @Select("select * from dish where category_id = #{categoryId} and status = #{enable}")
+    List<Dish> getByCategoryId(Long categoryId, Integer enable);
+
+
 }
