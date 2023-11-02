@@ -715,3 +715,4 @@
 127.0.0.1 - - [29/Oct/2023:20:48:09 +0800] "GET /api/shop/status HTTP/1.1" 200 41 "http://localhost/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"
 127.0.0.1 - - [29/Oct/2023:20:48:11 +0800] "PUT /api/shop/1 HTTP/1.1" 200 44 "http://localhost/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"
 127.0.0.1 - - [29/Oct/2023:20:48:11 +0800] "GET /api/shop/status HTTP/1.1" 200 41 "http://localhost/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"
+127.0.0.1 - - [01/Nov/2023:21:46:55 +0800] "GET /flowStatistics HTTP/1.1" 404 153 "-" "-"
