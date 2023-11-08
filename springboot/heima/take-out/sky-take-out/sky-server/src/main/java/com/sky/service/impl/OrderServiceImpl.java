@@ -65,6 +65,7 @@ public class OrderServiceImpl implements OrderService {
         BeanUtils.copyProperties(ordersSubmitDTO,orders);
         orders.setOrderTime(LocalDateTime.now());
         orders.setPayStatus(Orders.UN_PAID);
+        orders.setAddress(addressBookMapper.getById(orders.getAddressBookId()).getDetail());
         orders.setStatus(Orders.PENDING_PAYMENT);
         orders.setNumber(String.valueOf(System.currentTimeMillis()));
         orders.setPhone(addressBook.getPhone());
@@ -134,5 +135,20 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         return new PageResult(page.getTotal(),orderVOList);
+    }
+
+    /**
+     * 查询订单详情
+     * @param id
+     * @return
+     */
+    @Override
+    public OrderVO details(Long id) {
+        OrderVO orderVO = new OrderVO();
+        Orders orders = orderMapper.getByOrderId(id);
+        List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(orders.getId());
+        BeanUtils.copyProperties(orders,orderVO);
+        orderVO.setOrderDetailList(orderDetailList);
+        return orderVO;
     }
 }
