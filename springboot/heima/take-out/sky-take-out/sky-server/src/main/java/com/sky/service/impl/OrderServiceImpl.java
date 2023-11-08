@@ -179,4 +179,24 @@ public class OrderServiceImpl implements OrderService {
         }
 
     }
+
+    /**
+     * 再来一单
+     * @param id
+     */
+    @Override
+    public void repeat(Long id) {
+        //查询订单详情
+        List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(id);
+        List<ShoppingCart> shoppingCartList = new ArrayList<>();
+        Long currentId = BaseContext.getCurrentId();
+        for (OrderDetail orderDetail:orderDetailList){
+            ShoppingCart shoppingCart = new ShoppingCart();
+            BeanUtils.copyProperties(orderDetail,shoppingCart);
+            shoppingCart.setUserId(currentId);
+            shoppingCart.setCreateTime(LocalDateTime.now());
+            shoppingCartList.add(shoppingCart);
+        }
+        shoppingCartMapper.insertBatch(shoppingCartList);
+    }
 }
