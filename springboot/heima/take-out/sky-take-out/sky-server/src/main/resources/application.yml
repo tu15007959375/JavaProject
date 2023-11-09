@@ -54,6 +54,6 @@ sky:
     appid: ${sky.wechat.appid}
     secret: ${sky.wechat.secret}
   shop:
-    青海省西宁市城北区宁大路235号青海大学
+    address: 青海省西宁市城北区宁大路235号青海大学
   baidu:
-    nbNi7uwUlppkzYC2pXsQafERrglnCf4G
+    ak: nbNi7uwUlppkzYC2pXsQafERrglnCf4G
