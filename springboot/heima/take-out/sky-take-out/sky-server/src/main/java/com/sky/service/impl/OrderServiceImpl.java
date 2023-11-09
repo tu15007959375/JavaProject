@@ -17,6 +17,7 @@ import com.sky.mapper.OrderMapper;
 import com.sky.mapper.ShoppingCartMapper;
 import com.sky.result.PageResult;
 import com.sky.service.OrderService;
+import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
 import org.springframework.beans.BeanUtils;
@@ -212,6 +213,24 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
+     * 订单数量统计
+     * @return
+     */
+    @Override
+    public OrderStatisticsVO statistics() {
+        OrderStatisticsVO orderStatisticsVO = new OrderStatisticsVO();
+        OrdersPageQueryDTO ordersPageQueryDTO = new OrdersPageQueryDTO();
+        ordersPageQueryDTO.setStatus(Orders.TO_BE_CONFIRMED);
+        orderStatisticsVO.setToBeConfirmed(orderMapper.pageQuery(ordersPageQueryDTO).getResult().size());
+        ordersPageQueryDTO.setStatus(Orders.CONFIRMED);
+        orderStatisticsVO.setConfirmed(orderMapper.pageQuery(ordersPageQueryDTO).getResult().size());
+        ordersPageQueryDTO.setStatus(Orders.DELIVERY_IN_PROGRESS);
+        orderStatisticsVO.setDeliveryInProgress(orderMapper.pageQuery(ordersPageQueryDTO).getResult().size());
+        return orderStatisticsVO;
+    }
+
+
+    /**
      * 返回菜品信息，在查看时需要显示菜品相关信息
      * @param page
      * @return
@@ -249,4 +268,6 @@ public class OrderServiceImpl implements OrderService {
         // 将该订单对应的所有菜品信息拼接在一起
         return String.join("", orderDishList);
     }
+
+
 }
