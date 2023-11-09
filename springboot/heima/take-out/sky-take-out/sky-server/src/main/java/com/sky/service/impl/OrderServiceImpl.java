@@ -246,10 +246,30 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public void rejection(OrdersRejectionDTO ordersRejectionDTO) {
+        // 根据id查询订单
+        Orders ordersDB = orderMapper.getByOrderId(ordersRejectionDTO.getId());
+
+        // 订单只有存在且状态为2（待接单）才可以拒单
+        if (ordersDB == null || !ordersDB.getStatus().equals(Orders.TO_BE_CONFIRMED)) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
         Orders orders = new Orders();
         orders.setStatus(Orders.CANCELLED);
         orders.setId(ordersRejectionDTO.getId());
-        orders.setCancelReason(ordersRejectionDTO.getRejectionReason());
+        orders.setRejectionReason(ordersRejectionDTO.getRejectionReason());
+        orders.setCancelTime(LocalDateTime.now());
+        orderMapper.update(orders);
+    }
+
+    /**
+     * 取消订单
+     */
+    @Override
+    public void cancel(OrdersCancelDTO ordersCancelDTO) {
+        Orders orders = new Orders();
+        orders.setStatus(Orders.CANCELLED);
+        orders.setId(ordersCancelDTO.getId());
+        orders.setCancelReason(ordersCancelDTO.getCancelReason());
         orders.setCancelTime(LocalDateTime.now());
         orderMapper.update(orders);
     }

@@ -87,4 +87,17 @@ public class OrderController {
         OrderVO orderVO = orderService.details(id);
         return Result.success(orderVO);
     }
+
+    /**
+     * 取消订单
+     * @param ordersCancelDTO
+     * @return
+     */
+    @PutMapping("/cancel")
+    @ApiOperation("取消订单")
+    public Result cancel(@RequestBody OrdersCancelDTO ordersCancelDTO){
+        log.info("取消订单:{}",ordersCancelDTO);
+        orderService.cancel(ordersCancelDTO);
+        return Result.success();
+    }
 }
