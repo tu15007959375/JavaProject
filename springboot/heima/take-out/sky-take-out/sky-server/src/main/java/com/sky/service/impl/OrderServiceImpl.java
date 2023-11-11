@@ -22,6 +22,7 @@ import com.sky.utils.HttpClientUtil;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,8 @@ public class OrderServiceImpl implements OrderService {
     private AddressBookMapper addressBookMapper;
     @Autowired
     private ShoppingCartMapper shoppingCartMapper;
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     @Value("${sky.shop.address}")
     private String shopAddress;
@@ -116,9 +119,10 @@ public class OrderServiceImpl implements OrderService {
     public void payment(OrdersPaymentDTO ordersPaymentDTO) {
         //下单时直接根据用户id更新订单状态为已支付
         Long currentId = BaseContext.getCurrentId();
-
+        Orders ordersDB = orderMapper.getByNumber(ordersPaymentDTO.getOrderNumber());
         // 根据订单id更新订单的状态、支付方式、支付状态、结账时间
         Orders orders = Orders.builder()
+                .id(ordersDB.getId())
                 .userId(currentId)
                 .status(Orders.TO_BE_CONFIRMED)
                 .payStatus(Orders.PAID)
@@ -126,6 +130,12 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderMapper.updateByUserId(orders);
+        Map map = new HashMap<>();
+        map.put("type",1);
+        map.put("orderId",ordersDB.getId());
+        map.put("content","订单号" + ordersPaymentDTO.getOrderNumber());
+        String s = JSON.toJSONString(map);
+        webSocketServer.sendToAllClient(s);
     }
 
     /**
