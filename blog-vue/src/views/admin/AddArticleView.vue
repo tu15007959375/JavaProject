@@ -1,6 +1,6 @@
 <template>
     <div style="text-align: left;">
-        <h1 style="color: black;text-align: center;">编辑文章</h1>
+        <h1 style="color: black;text-align: center;">编辑文章&nbsp;&nbsp;&nbsp;&nbsp;{{title}}</h1>
         <br>
         <MdEditor v-if="initSuccess" :content="text" :title="title"></MdEditor>
 

@@ -41,10 +41,10 @@ public interface ArticleService {
     String getArticleTitleById(Integer id);
     /**
      * 根据id更新文章信息
-     * @param articleDTO
+     * @param saveArticleDTO
      * @return
      */
-    void update(ArticleDTO articleDTO);
+    void update(SaveArticleDTO saveArticleDTO);
 
     /**
      * 新增md文件

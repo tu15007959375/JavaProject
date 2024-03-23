@@ -81,23 +81,27 @@ public class ArticleController {
 
     /**
      * 根据id更新文章信息
-     * @param articleDTO
+     * @param saveArticleDTO
      * @return
      */
     @PutMapping
-    @CacheEvict(value = "categoryCache",key = "'categoryCache'")
-    public Result update(@RequestBody ArticleDTO articleDTO){
-        String fileName = articleService.getArticleTitleById(articleDTO.getId());
-        File file = new File(articleDTO.getFilePath() + "/" + fileName + ".md");
-        log.info("更新文章信息:{},{}",articleDTO,articleDTO.getFilePath() + "/" + fileName + ".md");
+    public Result update(@RequestBody SaveArticleDTO saveArticleDTO) throws IOException {
+        String fileName = saveArticleDTO.getOriginTitle();
+        File file = new File(saveArticleDTO.getFilePath() + "/" + fileName + ".md");
+        log.info("更新文章信息:{},{}",saveArticleDTO,saveArticleDTO.getFilePath() + "/" + fileName + ".md");
         if(file.exists()){
-            File newFile = new File(articleDTO.getFilePath() + "/" + articleDTO.getTitle() + ".md");
-            if(file.renameTo(newFile)){
-                articleService.update(articleDTO);
-                return Result.success();
-            }else {
-                return Result.error("目录下存在同名文件");
+            FileWriter writer;
+            if(saveArticleDTO.getOriginTitle().equals(saveArticleDTO.getTitle())){
+                writer = new FileWriter(file);
+            }else{
+                file.delete();
+                writer = new FileWriter(new File(saveArticleDTO.getFilePath() + "/" + saveArticleDTO.getTitle() + ".md"));
             }
+            writer.write(saveArticleDTO.getText());
+            writer.flush();
+            writer.close();
+            articleService.update(saveArticleDTO);
+            return Result.success();
         }else{
             return Result.error("文件夹中不存在该文件");
         }

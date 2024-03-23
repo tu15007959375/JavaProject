@@ -40,6 +40,7 @@
         text: '',
         dialogFormVisible: false,
         categoryNameList: [],
+        originCategoryName:'',
         form: {
           title: '',
           intro: '',
@@ -61,6 +62,7 @@
           if (res.data.code == 1) {
             this.form.intro = res.data.data.intro
             this.form.categoryName = res.data.data.categoryName
+            this.originCategoryName = res.data.data.categoryName
           }
         })
         this.form.title = this.title
@@ -99,10 +101,15 @@
           return
         }
         this.dialogFormVisible = false
+        var methodString = 'post'
+        if (this.originCategoryName == this.form.categoryName) {
+          methodString = 'put'
+        }
         axios({
           url: `/api/admin/article`,
-          method: 'post',
+          method: methodString,
           data: {
+            
             title: this.form.title,
             intro: this.form.intro,
             categoryName: this.form.categoryName,

@@ -8,7 +8,7 @@ export default new Vuex.Store({
     categoryName: '',
     searchValue:'',
     categoryNameList:[],
-    filePath:'/home/tjx/blog/vue/dist/mymd',//生产/服务器环境：/home/tjx/blog/vue/dist/mymd  开发/本地环境：C:/Code/JavaProject/blog-vue/public/mymd
+    filePath:'C:/Code/JavaProject/blog-vue/public/mymd',//生产/服务器环境：/home/tjx/blog/vue/dist/mymd  开发/本地环境：C:/Code/JavaProject/blog-vue/public/mymd
   },
   getters: {
   },

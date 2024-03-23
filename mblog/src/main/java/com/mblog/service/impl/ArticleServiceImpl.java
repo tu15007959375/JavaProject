@@ -105,16 +105,16 @@ public class ArticleServiceImpl implements ArticleService {
     }
     /**
      * 根据id更新文章信息
-     * @param articleDTO
+     * @param saveArticleDTO
      * @return
      */
     @Transactional
-    public void update(ArticleDTO articleDTO) {
+    public void update(SaveArticleDTO saveArticleDTO) {
         Article article = new Article();
-        BeanUtils.copyProperties(articleDTO,article);
-        int categoryId = categoryMapper.getIdByName(articleDTO.getCategoryName());
+        BeanUtils.copyProperties(saveArticleDTO,article);
+        Article oldArticle = articleMapper.getArticleByTitle(saveArticleDTO.getOriginTitle());
         article.setUpdateTime(LocalDateTime.now());
-        article.setCategoryId(categoryId);
+        article.setId(oldArticle.getId());
         articleMapper.update(article);
     }
     /**

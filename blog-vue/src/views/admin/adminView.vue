@@ -40,30 +40,30 @@
             }
         },
         mounted() {
-            this.$prompt('请输入密码', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                inputValidator: (value) => {
-                    return this.password == value;
-                },
-                inputType: 'password',
-                inputErrorMessage: '密码验证失败',
-                lockScroll: false
-            }).then(() => {
-                this.$message({
-                    type: 'success',
-                    message: '验证成功'
-                });
+            // this.$prompt('请输入密码', '提示', {
+            //     confirmButtonText: '确定',
+            //     cancelButtonText: '取消',
+            //     inputValidator: (value) => {
+            //         return this.password == value;
+            //     },
+            //     inputType: 'password',
+            //     inputErrorMessage: '密码验证失败',
+            //     lockScroll: false
+            // }).then(() => {
+            //     this.$message({
+            //         type: 'success',
+            //         message: '验证成功'
+            //     });
 
-            }).catch(() => {
-                this.$message({
-                    type: 'error',
-                    message: '密码验证失败'
-                });
-                this.$router.push({
-                    path: `/`,
-                })
-            });
+            // }).catch(() => {
+            //     this.$message({
+            //         type: 'error',
+            //         message: '密码验证失败'
+            //     });
+            //     this.$router.push({
+            //         path: `/`,
+            //     })
+            // });
         },
         methods: {
             handleSelect(key) {
