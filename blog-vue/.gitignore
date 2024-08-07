@@ -4,7 +4,7 @@ node_modules
 #忽略mymd下文件
 /public/mymd/*
 #不忽略mymd文件夹
-!/public/mymd/
+!/public/mymd/.gitkeep
 # local env files
 .env.local
 .env.*.local
