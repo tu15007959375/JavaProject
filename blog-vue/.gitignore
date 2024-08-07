@@ -2,7 +2,7 @@
 node_modules
 /dist
 #忽略mymd下文件
-/public/mymd
+/public/mymd/*
 #不忽略mymd文件夹
 !/public/mymd/
 # local env files
