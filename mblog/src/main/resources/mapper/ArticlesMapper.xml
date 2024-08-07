@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mblog.mapper.ArticleMapper">
+    <update id="update">
+        update article
+        <set>
+            <if test="title != null">
+                title = #{title},
+            </if>
+            <if test="intro != null">
+                intro = #{intro},
+            </if>
+            <if test="updateTime != null">
+                updateTime = #{updateTime},
+            </if>
+            <if test="categoryId != null">
+                categoryId = #{categoryId},
+            </if>
+            <if test="categoryName != null">
+                categoryName = #{categoryName},
+            </if>
+            <if test="pageView != null">
+                pageView = #{pageView}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+    <update id="updateUserLike">
+        update userlike
+        <set>
+            <if test="likeflag != null">
+                likeflag = likeflag | #{likeflag},
+            </if>
+            <if test="loveflag != null">
+                loveflag = loveflag | #{loveflag},
+            </if>
+            <if test="smileflag != null">
+                smileflag =  smileflag | #{smileflag}
+            </if>
+        </set>
+        where (browserId = #{browserId} and articleId = #{articleId})
+    </update>
+    <update id="updateArticleLike">
+        update articlelike
+        <set>
+            <if test="likeflag != null">
+                likeNum = likeNum + #{likeflag},
+            </if>
+            <if test="loveflag != null">
+                loveNum = loveNum + #{loveflag},
+            </if>
+            <if test="smileflag != null">
+                smileNum = smileNum + #{smileflag}
+            </if>
+            where articleId = #{articleId}
+        </set>
+    </update>
+
+    <select id="getArticlesByCategoryNameAndPage" resultType="com.mblog.entity.Article">
+        select * from article
+        <where>
+            <if test="categoryName != null and categoryName != ''">
+                categoryName = #{categoryName}
+            </if>
+        </where>
+    </select>
+    <select id="getArticlesBySearch" resultType="com.mblog.entity.Article">
+        select * from article
+        <where>
+            <if test="searchValue != null and searchValue != ''">
+                and (title like concat('%',#{searchValue},'%') or intro like concat('%',#{searchValue},'%'))
+            </if>
+        </where>
+        order by createTime desc
+    </select>
+</mapper>
