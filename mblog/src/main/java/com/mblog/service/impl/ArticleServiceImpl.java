@@ -4,14 +4,13 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.mblog.dto.SaveArticleDTO;
 import com.mblog.dto.UserLikeDTO;
-import com.mblog.entity.Article;
-import com.mblog.entity.ArticleLike;
-import com.mblog.entity.Category;
-import com.mblog.entity.UserLike;
+import com.mblog.entity.*;
 import com.mblog.mapper.ArticleMapper;
 import com.mblog.mapper.CategoryMapper;
 import com.mblog.result.PageResult;
 import com.mblog.service.ArticleService;
+import com.mblog.vo.BaseInfoVO;
+import com.mblog.vo.PieVO;
 import com.mblog.vo.UserLikeVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -20,7 +19,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +45,7 @@ public class ArticleServiceImpl implements ArticleService {
      * 根据分类名称和每页大小以及第几页获取文章信息
      * @return
      */
-    public PageResult getArticlesByCategoryNameAndPage(String categoryName, Integer pageSize, Integer currentPage, Integer order) {
+    public PageResult getArticlesByCategoryNameAndPage(String categoryName, Integer pageSize, Integer currentPage, Integer order,String searchValue) {
 
 
         String cmp,filed = "createTime";
@@ -63,23 +66,11 @@ public class ArticleServiceImpl implements ArticleService {
             filed = "pageView";
         }
         PageHelper.startPage(currentPage,pageSize,filed+" "+cmp);
-        Page<Article> page = articleMapper.getArticlesByCategoryNameAndPage(categoryName,pageSize,currentPage);
+        Page<Article> page = articleMapper.getArticlesByCategoryNameAndPage(categoryName,pageSize,currentPage,searchValue);
 
         return new PageResult(page.getTotal(),page.getResult());
     }
-    /**
-     * 根据搜索内容获取文章信息
-     * @param searchValue
-     * @return
-     */
-    public PageResult getArticlesBySearch(String searchValue,Integer pageSize,Integer currentPage) {
-        PageHelper.startPage(1,5);
-        if(currentPage != null && pageSize != null){
-            PageHelper.startPage(currentPage,pageSize);
-        }
-        Page<Article> page = articleMapper.getArticlesBySearch(searchValue);
-        return new PageResult(page.getTotal(),page.getResult());
-    }
+
 
     /**
      * 删除指定id的文章，数据库和文件夹中同时删除
@@ -164,12 +155,7 @@ public class ArticleServiceImpl implements ArticleService {
         return articleMapper.getArticleByTitle(articleTitle);
     }
 
-    public List<Integer> getEverydayCountsByTime(String beginTime, String endTime) {
-        //转成日期
-        //遍历，从begin到end，每次plus一天
-        //查找日期时间段下的文章数量
-        return null;
-    }
+
     /**
      * 获取文章的点赞相关信息
      * @param articleTitle
@@ -204,6 +190,12 @@ public class ArticleServiceImpl implements ArticleService {
         articleMapper.updateUserLike(userLike);
         //更新文章点赞信息
         articleMapper.updateArticleLike(userLike);
+
+        //更新月点赞量
+        if(userLike.getLikeflag() != 1){
+            return;
+        }
+        articleMapper.addNumsByNameAndDate(LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()),"likeNums");
     }
     /**
      * 获取用户的点赞相关信息
@@ -212,9 +204,14 @@ public class ArticleServiceImpl implements ArticleService {
      */
     public UserLikeVO getUserLike(UserLikeDTO userLikeDTO) {
         UserLikeVO userLikeVO = new UserLikeVO();
+        //更新访问信息，即访问+1
         Article article = articleMapper.getArticleByTitle(userLikeDTO.getArticleTitle());
         article.setPageView(article.getPageView()+1);
         articleMapper.update(article);
+
+
+        articleMapper.addNumsByNameAndDate(LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()),"pageViews");
+
         BeanUtils.copyProperties(article,userLikeVO);
         //判断数据库是否存在该条数据，为空则插入
         UserLike userLike = new UserLike();
@@ -230,6 +227,81 @@ public class ArticleServiceImpl implements ArticleService {
         }
         BeanUtils.copyProperties(userLike1,userLikeVO);
         return userLikeVO;
+    }
+
+
+
+    /**
+     * 根据开始和结束时间获取区域内的每天文章数量
+     * @param beginTime
+     * @param endTime
+     * @return
+     */
+    public List<Integer> getEveryMonthCountsByTime(String beginTime, String endTime) {
+        ArrayList<Integer> result = new ArrayList<>();
+        LocalDate date = LocalDate.parse(beginTime, DateTimeFormatter.ISO_DATE);
+        LocalDate date2 = LocalDate.parse(endTime, DateTimeFormatter.ISO_DATE).plusDays(1);
+        //定义时分秒
+        LocalTime time2 = LocalTime.of(0, 0);  // 默认时间为午夜
+        //开始结束时间 xxxx-xx-xx 00:00:00
+        LocalDateTime beginTimeDate = LocalDateTime.of(date, time2);
+        LocalDateTime endTimeDate = LocalDateTime.of(date2, time2);
+        for(LocalDateTime currentTime = beginTimeDate;currentTime.isBefore(endTimeDate);currentTime = currentTime.plusMonths(1)) {
+            //最后一次临界判断
+            if(currentTime.plusMonths(1).isBefore(endTimeDate)){
+                result.add(articleMapper.getCountsByTime(currentTime,currentTime.plusMonths(1)));
+            }else{
+                result.add(articleMapper.getCountsByTime(currentTime,endTimeDate));
+            }
+
+        }
+        return result;
+    }
+
+    /**
+     * 获取后台管理系统基本信息
+     * @return
+     */
+    public BaseInfoVO getBaseInfo() {
+        BaseInfoVO baseInfoVO = new BaseInfoVO();
+        baseInfoVO.setArticleNums(articleMapper.getAllArticlesNums());
+        // 获取当前月第一天及最后一天
+        LocalDateTime firstDayOfMonth = LocalDateTime.of(LocalDate.from(LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth())), LocalTime.MIN);
+        LocalDateTime lastDayOfMonth = LocalDateTime.of(LocalDate.from(LocalDateTime.now().with(TemporalAdjusters.lastDayOfMonth())), LocalTime.MAX);
+        lastDayOfMonth = lastDayOfMonth.plusDays(1);
+        baseInfoVO.setArticleNums(articleMapper.getAllArticlesNums());
+        baseInfoVO.setCategoryNums(categoryMapper.getAllCategoryNums());
+        baseInfoVO.setArticleMonthNums(articleMapper.getCountsByTime(firstDayOfMonth,lastDayOfMonth));
+
+        //初始化pageViews和likeNums，即访问量和点赞
+        LocalDate firstDay = LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
+        baseInfoVO.setPageViewNums(articleMapper.getNumsByNameAndDate(firstDay,"pageViews"));
+        baseInfoVO.setLikeNums(articleMapper.getNumsByNameAndDate(firstDay,"likeNums"));
+
+        //初始化月增长
+        //获取上个月的访问量
+        MonthGrowth preMonthViews = articleMapper.getMonthGrowthByNameAndDate(LocalDate.now().minusMonths(1).with(TemporalAdjusters.firstDayOfMonth()), "pageViews");
+        if(preMonthViews != null){
+            baseInfoVO.setPageViewMonthNums(baseInfoVO.getPageViewNums()-preMonthViews.getNums());
+        }else{
+            baseInfoVO.setPageViewMonthNums(baseInfoVO.getPageViewNums());
+        }
+        //获取上个月的点赞量
+        MonthGrowth preMonthLikes = articleMapper.getMonthGrowthByNameAndDate(LocalDate.now().minusMonths(1).with(TemporalAdjusters.firstDayOfMonth()), "likeNums");
+        if(preMonthLikes != null){
+            baseInfoVO.setLikeMonthNums(baseInfoVO.getLikeNums()-preMonthLikes.getNums());
+        }else{
+            baseInfoVO.setLikeMonthNums(baseInfoVO.getLikeNums());
+        }
+
+        //获取分类相关信息
+        List<Category> categories = categoryMapper.getAllFirstLevelCategoryName();
+        List<PieVO> pieVOList = new ArrayList<>();
+        for (Category category : categories) {
+            pieVOList.add(new PieVO(category.getNumber(),category.getName()));
+        }
+        baseInfoVO.setPieList(pieVOList);
+        return baseInfoVO;
     }
 
     public int getRootCategoryId(int curId){

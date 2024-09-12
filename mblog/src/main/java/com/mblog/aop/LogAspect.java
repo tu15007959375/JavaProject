@@ -63,7 +63,7 @@ public class LogAspect {
         String businessType = log.businessType().toString();
 
         // 这里的操作人员仅靠后端是写不了的  需要前端的token认证  我直接把操作人员改为admin
-//        String username = "admin";
+//        String username = "req";
 
         // 获取ip地址
         String ipAddress = IpUtil.getIpAddress(request);

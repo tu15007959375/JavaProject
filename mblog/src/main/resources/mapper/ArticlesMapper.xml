@@ -63,15 +63,9 @@
             <if test="categoryName != null and categoryName != ''">
                 categoryName = #{categoryName}
             </if>
-        </where>
-    </select>
-    <select id="getArticlesBySearch" resultType="com.mblog.entity.Article">
-        select * from article
-        <where>
             <if test="searchValue != null and searchValue != ''">
                 and (title like concat('%',#{searchValue},'%') or intro like concat('%',#{searchValue},'%'))
             </if>
         </where>
-        order by createTime desc
     </select>
 </mapper>

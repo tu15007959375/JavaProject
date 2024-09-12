@@ -1,6 +1,5 @@
 <template>
     <div>
-        <h1 style="color: black;">备忘管理</h1>
         <NcActions></NcActions>
     </div>
 </template>
@@ -22,5 +21,5 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 </style>

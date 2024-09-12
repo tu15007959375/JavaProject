@@ -1,6 +1,5 @@
 <template>
     <div>
-        <h1 style="color: black;">文章管理</h1>
         <div>
             <div style="text-align: left;">
                 <span style="margin-right: 20px;">当前文件路径：{{filePath}}</span>
@@ -79,7 +78,6 @@
 </template>
 
 <script>
-    import axios from 'axios'
     export default {
         components: {
 
@@ -92,9 +90,9 @@
                 currentPage: 1,
                 pageSize: 20,
                 totalSize: -1,
-                isSearch: false,
                 searchValue: '',
                 filePath: '',
+                originTitle:'',
                 dialogFormVisible: false,
                 form: {
                     id: '',
@@ -119,12 +117,12 @@
                     this.$message.error('介绍不能为空')
                     return
                 }
-                axios({
+                this.$axios({
                     url: `/api/admin/article`,
-                    method: 'put',
+                    method: 'post',
                     data: {
                         id: parseInt(this.form.id),
-                        originTitle :this.form.title,
+                        originTitle :this.originTitle,
                         title: this.form.title,
                         intro: this.form.intro,
                         categoryName: this.form.categoryName,
@@ -133,22 +131,18 @@
                 }).then(res => {
                     if (res.data.code == 1) {
                         this.$message.success('修改成功')
+                        this.originTitle = ''
+                        location.reload();
                     } else {
                         this.$message.error(res.data.msg)
+                        location.reload();
                     }
                 })
                 this.getAllArticlesByCategoryNameAndPage(this.pageSize, this.currentPage)
                 this.dialogFormVisible = false
             },
             handleSearch() {
-                this.isSearch = true
-                if (this.searchValue == '') {
-                    this.isSearch = false
-                    this.getAllArticlesByCategoryNameAndPage(this.pageSize, this.currentPage)
-                } else {
-                    this.sendSearchRequest(this.searchValue)
-                }
-
+                this.getAllArticlesByCategoryNameAndPage(this.pageSize, this.currentPage)
             },
             handleSetFilePath() {
                 this.$prompt('请输入文件路径', '提示', {
@@ -175,6 +169,7 @@
                 console.log(index, row);
                 this.form.id = row.id + ''
                 this.form.title = row.title
+                this.originTitle = row.title
                 this.form.intro = row.intro
                 this.form.categoryName = row.categoryName
                 this.dialogFormVisible = true
@@ -192,7 +187,7 @@
                     type: 'warning'
                 }).then(() => {
                     console.log('删除id:', row.id);
-                    axios.delete('/api/admin/article', {
+                    this.$axios.delete('/api/admin/article', {
                         params: {
                             id: row.id,
                             filePath: this.filePath
@@ -204,17 +199,20 @@
                                 message: '删除成功!',
                             });
                             this.articleList.splice(index, 1);
+                            location.reload();
                         } else {
                             this.$message({
                                 type: 'error',
                                 message: res.data.msg,
                             });
+                            location.reload();
                         }
                     }).catch(() => {
                         this.$message({
                             type: 'error',
                             message: '删除失败',
                         });
+                        location.reload();
                     });
                 }).catch(() => {
                     this.$message({
@@ -224,52 +222,22 @@
                 });
 
             },
-            isSelect(name) {
-                return this.$store.state.categoryName == name //这是通过getters来获取 在getters中做了些操作
+            handleCurrentChange(val) {
+                this.currentPage = val
+                this.getAllArticlesByCategoryNameAndPage(this.pageSize, this.currentPage)
+                
             },
             handleSizeChange(val) {
                 this.pageSize = val
-                if (this.isSearch) {
-                    this.sendSearchRequest(this.searchValue)
-                } else {
-                    this.getAllArticlesByCategoryNameAndPage(this.pageSize, this.currentPage)
-                }
-            },
-            handleCurrentChange(val) {
-                this.currentPage = val
-                if (this.isSearch) {
-                    this.sendSearchRequest(this.searchValue)
-                } else {
-                    this.getAllArticlesByCategoryNameAndPage(this.pageSize, this.currentPage)
-                }
-            },
-            sendSearchRequest(searchValue) {
-                axios({
-                    url: `/api/user/article/search/${searchValue}?pageSize=${this.pageSize}&currentPage=${this.currentPage}`,
-                    method: 'get',
-                }).then(res => {
-                    if (res.data.code == 1) {
-                        console.log("大小为", res.data.data.total)
-                        this.totalSize = res.data.data.total
-                        this.articleList = res.data.data.records
-                    }
-                })
+                this.getAllArticlesByCategoryNameAndPage(this.pageSize, this.currentPage)
             },
             getAllArticlesByCategoryNameAndPage(pageSize, currentPage) {
-                // const name = this.$store.state.categoryName
-                // const categoryId = this.$store.state.categoryId
                 var urls = '/api/user/article/list/'
-                // if (name != '' && name != null && (categoryId != -1 || this.$route.params.categoryName != '')) {
-                //     // console.log('不为空');
-                //     this.backgroundactive = 0
-                //     urls += name
-                // }
-                if (pageSize != -1 && currentPage != -1) {
-                    this.backgroundactive = 0
-                    urls += `?pageSize=${pageSize}&currentPage=${currentPage}&order=3`
-                }
+
+                urls += `?pageSize=${pageSize}&currentPage=${currentPage}&order=3&searchValue=${this.searchValue}`
+                
                 console.log('发出get请求', urls)
-                axios({
+                this.$axios({
                     url: urls,
                     method: 'get',
                 }).then(res => {
@@ -287,7 +255,7 @@
                 this.categoryNameList = this.$store.state.categoryNameList
                 if (this.categoryNameList.length == 0) {
                     console.log("未从store获取到categoryNameList");
-                    axios({
+                    this.$axios({
                         url: '/api/user/category/getAllNames',
                         method: 'get',
                     }).then(res => {
@@ -304,7 +272,7 @@
     }
 </script>
 
-<style>
+<style scoped>
     .info {
         position: absolute;
         float: right;

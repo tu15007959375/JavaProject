@@ -3,7 +3,7 @@ package com.mblog.controller.user;
 import com.mblog.entity.Category;
 import com.mblog.result.Result;
 import com.mblog.service.CategoryService;
-import com.mblog.vo.CategoryVo;
+import com.mblog.vo.CategoryVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,9 +45,9 @@ public class CategoryController {
      * @return
      */
     @GetMapping("/init")
-    public Result<List<CategoryVo>> init(){
-        List<CategoryVo> categoryVoList = categoryService.init();
-        return Result.success(categoryVoList);
+    public Result<List<CategoryVO>> init(){
+        List<CategoryVO> categoryVOList = categoryService.init();
+        return Result.success(categoryVOList);
     }
 }
 

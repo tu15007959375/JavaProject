@@ -29,4 +29,13 @@ public class SysOperLog {
     private String params;
 
     private String ip;
+
+    public SysOperLog(String operation, String method, LocalDateTime createTime, String ip) {
+        this.operation = operation;
+        this.method = method;
+        this.createTime = createTime;
+        this.ip = ip;
+        this.businessType = "unknown";
+        this.params = "unknown";
+    }
 }

@@ -100,4 +100,11 @@ public interface CategoryMapper {
      */
     @Update("update categories set number = number+#{number} where id = #{categoryId}")
     void addNumberByCategoryId(@Param("number")Integer number, @Param("categoryId")Integer categoryId);
+
+    @Select("select count(*) from categories")
+    Integer getAllCategoryNums();
+
+
+    @Select("select * from categories where level=0")
+    List<Category> getAllFirstLevelCategoryName();
 }

@@ -3,7 +3,7 @@ package com.mblog.service.impl;
 import com.mblog.entity.Category;
 import com.mblog.mapper.CategoryMapper;
 import com.mblog.service.CategoryService;
-import com.mblog.vo.CategoryVo;
+import com.mblog.vo.CategoryVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,10 +39,10 @@ public class CategoryServiceImpl implements CategoryService {
      * 返回多级分类嵌套列表
      * @return
      */
-    public List<CategoryVo> init() {
+    public List<CategoryVO> init() {
         ValueOperations<Object, Object> opsForValue = redisTemplate.opsForValue();
         List<Integer> getFromSqlIds = new ArrayList<>();
-        List<CategoryVo> categoryVoRedisList = new ArrayList<>();
+        List<CategoryVO> categoryVORedisList = new ArrayList<>();
         int tag = 0;//用于判断redis中是否存在分类id列表,0不存在，1存在
         //redis中存在数据
         if(Boolean.TRUE.equals(redisTemplate.hasKey("categoryIds"))){
@@ -52,7 +52,7 @@ public class CategoryServiceImpl implements CategoryService {
             if (categoryIds != null) {
                 for (Integer categoryId : categoryIds) {
                     if(Boolean.TRUE.equals(redisTemplate.hasKey("category"+categoryId))){
-                        categoryVoRedisList.add((CategoryVo)opsForValue.get("category"+categoryId));
+                        categoryVORedisList.add((CategoryVO)opsForValue.get("category"+categoryId));
                     }else {
                         getFromSqlIds.add(categoryId);
                     }
@@ -64,38 +64,38 @@ public class CategoryServiceImpl implements CategoryService {
         }
         if(tag == 1 && getFromSqlIds.isEmpty()){
             System.out.println("不需要从数据库获取数据");
-            return categoryVoRedisList;
+            return categoryVORedisList;
         }
-        List<CategoryVo> categoryVoList = new ArrayList<>();
+        List<CategoryVO> categoryVOList = new ArrayList<>();
         List<Category> categories = categoryMapper.getAll();
 
         for (Category category : categories) {
-            CategoryVo categoryVo = new CategoryVo();
+            CategoryVO categoryVo = new CategoryVO();
             BeanUtils.copyProperties(category, categoryVo);
             if(tag == 1){
                 if(getFromSqlIds.contains(category.getId())){
-                    categoryVoList.add(categoryVo);
+                    categoryVOList.add(categoryVo);
                 }
             }else{
                 if (category.getParentId() == -1 ) {
 
-                    categoryVoList.add(categoryVo);
+                    categoryVOList.add(categoryVo);
                 }
             }
 
         }
         if(tag == 0){
-            List<Integer> categoryIds = categoryVoList.stream().map(CategoryVo::getId).collect(Collectors.toList());
+            List<Integer> categoryIds = categoryVOList.stream().map(CategoryVO::getId).collect(Collectors.toList());
             opsForValue.set("categoryIds",categoryIds);
         }
-        findSubCategory(categories,categoryVoList);
+        findSubCategory(categories, categoryVOList);
 
-        for (int i = 0;i <categoryVoList.size();i++){
-            System.out.println("从数据库获取分类id:name->"+categoryVoList.get(i).getId()+":"+categoryVoList.get(i).getName());
-            opsForValue.set("category"+categoryVoList.get(i).getId(),categoryVoList.get(i));
+        for (int i = 0; i < categoryVOList.size(); i++){
+            System.out.println("从数据库获取分类id:name->"+ categoryVOList.get(i).getId()+":"+ categoryVOList.get(i).getName());
+            opsForValue.set("category"+ categoryVOList.get(i).getId(), categoryVOList.get(i));
         }
-        categoryVoRedisList.addAll(categoryVoList);
-        return categoryVoRedisList;
+        categoryVORedisList.addAll(categoryVOList);
+        return categoryVORedisList;
     }
     /**
      * 获取所有分类名
@@ -147,26 +147,26 @@ public class CategoryServiceImpl implements CategoryService {
         redisTemplate.delete("category" + rootId);
     }
 
-    private static int countAllNumber(CategoryVo categoryVo) {
+    private static int countAllNumber(CategoryVO categoryVo) {
         if (categoryVo.getChildren().isEmpty()) {
             return categoryVo.getNumber();
         }
         int count = 0;
-        for (CategoryVo child : categoryVo.getChildren()) {
+        for (CategoryVO child : categoryVo.getChildren()) {
             count += countAllNumber(child);
         }
         categoryVo.setNumber(count);
         return count;
     }
-    private void findSubCategory(List<Category> categories, List<CategoryVo> categoryVoList) {
+    private void findSubCategory(List<Category> categories, List<CategoryVO> categoryVOList) {
         // 遍历一级
-        for (CategoryVo categoryVo : categoryVoList) {
-            List<CategoryVo> curVoList = new ArrayList<>();
+        for (CategoryVO categoryVo : categoryVOList) {
+            List<CategoryVO> curVoList = new ArrayList<>();
             // 查找子级
             for (Category category : categories) {
                 // 判断当前目录是否是子父级关系
                 if (categoryVo.getId().equals(category.getParentId())) {
-                    CategoryVo temp = new CategoryVo();
+                    CategoryVO temp = new CategoryVO();
                     BeanUtils.copyProperties(category,temp);
                     curVoList.add(temp);
                 }

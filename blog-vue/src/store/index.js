@@ -14,6 +14,9 @@ export default new Vuex.Store({
   },
   //同步操作
   mutations: {
+    setUserInfo(state,userInfo){
+      state.userInfo = userInfo
+    },
     setCategoryId(state,categoryId) {
       state.categoryId = categoryId
     },

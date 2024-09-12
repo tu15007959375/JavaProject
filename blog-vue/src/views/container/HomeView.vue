@@ -19,10 +19,14 @@
 
           </el-col>
           <el-col :span="4">
-            <el-input v-model="searchValue" @keyup.enter.native="handleSearch">
+            <el-input v-model="searchValue" @keyup.enter.native="handleSearch" maxlength="5" >
               <el-button slot="append" icon="search" @click="handleSearch">搜索</el-button>
             </el-input>
           </el-col>
+          <el-col :span="1">
+            <el-button  v-show="!isLogin" type="text" style="color: black;" @click="jumpLogin" >登录</el-button>
+            <el-button  v-show="isLogin" type="text" style="color: black;" @click="jumpOut" >登出</el-button>
+          </el-col >
         </el-row>
         <!--中部，页面展示-->
       </el-header>
@@ -46,7 +50,7 @@
 </template>
 
 <script>
-  import axios from 'axios'
+
   import MenuSun from "@/components/menuList.vue";
 
 
@@ -61,21 +65,24 @@
         activeIndex2: '1',
         searchValue: '',
         menuList: [],
+        isLogin:false
       }
     },
-    created() {
-
+    mounted() {
       this.getAllCategories()
-     
 
+      if(window.localStorage.getItem("userInfo") != null){
+        this.isLogin = true
+    }
     },
     methods: {
       handleSearch() {
         console.log("搜索", this.searchValue) // 输出输入框的值
         this.$store.commit('setSearchValue', this.searchValue)
+        this.searchValue = ''
       },
       getAllCategories() {
-        axios({
+        this.$axios({
           url: '/api/user/category/init',
           method: 'get',
         }).then(res => {
@@ -91,7 +98,7 @@
         })
       },
       handleSelect(key) {
-        this.$store.state.searchValue = ''
+        this.$store.commit('setSearchValue', '')
         this.searchValue = ''
         key = key.split(',')
         if (parseInt(key[0]) >= 0) {
@@ -112,6 +119,17 @@
         }
 
       },
+      jumpLogin(){
+        this.$router.push({ path: `/login` })
+      },
+      jumpOut() {
+                window.localStorage.removeItem("userInfo")
+                // this.$store.commit('setIsLogin', false)
+                this.$message.success("登出成功！")
+                location.reload();
+                this.$router.push("/")
+            },
+
     },
 
   }
@@ -156,14 +174,10 @@
   setInterval(setTime, 1000);
 </script>
 
-<style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
+<style >
 
-  .el-header {
+
+  .menu {
     box-shadow: 0 0 5px 1px #999;
     z-index: 1;
     background-color: #ffffff;

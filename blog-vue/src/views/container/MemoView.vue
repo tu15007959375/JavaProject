@@ -15,7 +15,7 @@
             <br>
             <br>
             <el-button type="primary" size="mini" style="float: right;margin-right: 4%;" @click="showaddform">新增</el-button>
-            <el-button type="primary" size="mini" style="float: right;margin-right: 6%;" @click="verifyPassword">验证密码</el-button>
+            <!-- <el-button type="primary" size="mini" style="float: right;margin-right: 6%;" @click="verifyPassword">验证密码</el-button> -->
             <el-table :data="memoList" style="width: 100%">
                 <el-table-column label="内容" width="160px">
                     
@@ -115,13 +115,12 @@
 </template>
   
 <script>
-import axios from 'axios'
 export default {
     data() {
         return {
             memoList: [],
             date: '',
-            password: '381023',
+            // password: '381023',
             dialogFormVisible: false,
             dialogFormVisible2: false,
             form: {
@@ -130,7 +129,7 @@ export default {
                 tag: '',
                 status:'',
             },
-            passwordFlag:false,
+            // passwordFlag:false,
             form2: {
                 id: '',
                 name: '',
@@ -152,7 +151,7 @@ export default {
                 console.log('填充date')
                 formdate += ' 08:00:00'
             }
-            axios({
+            this.$axios({
                 url: `/api/admin/memo`,
                 method: 'post',
                 data: {
@@ -169,14 +168,14 @@ export default {
                         delete this.form[key];
                     }
                 } else {
-                    this.$message.error('插入错误!')
+                    this.$message.error('请先登录再进行新增!')
                 }
             })
             this.dialogFormVisible = false
         },
         //点击编辑更新memo
         updatememo() {
-            axios({
+            this.$axios({
                 url: `/api/admin/memo`,
                 method: 'put',
                 data: {
@@ -191,15 +190,15 @@ export default {
                     this.sendRequestSetMemoList(this.date)
                     this.$message.success('修改成功')
                 } else {
-                    this.$message.error('修改错误!')
+                    this.$message.error('请先登录再进行修改!')
                 }
             })
             this.dialogFormVisible2 = false
         },
         switchStatus(val, row) {
-            if (this.passwordFlag) { 
+            // if (this.passwordFlag) { 
                 console.log(val, row)
-            axios({
+            this.$axios({
                 url: `/api/admin/memo`,
                 method: 'put',
                 data: {
@@ -210,14 +209,14 @@ export default {
                 if (res.data.code == 1) {
                     // this.memoList = res.data.data
                 } else {
-                    this.$message.error('修改状态错误!')
+                    this.$message.error('请先登录再进行修改!')
                     row.status = val == 1 ? 0 : 1
                 }
             })
-            } else {
-                this.$message.warning('请点击验证密码按钮验证密码')
-                row.status = val == 1 ? 0 : 1
-            }
+            // } else {
+            //     this.$message.warning('请点击验证密码按钮验证密码')
+            //     row.status = val == 1 ? 0 : 1
+            // }
             
 
         },
@@ -226,7 +225,7 @@ export default {
             this.sendRequestSetMemoList(this.date)
         },
         handleEdit(index, row) {
-            if (this.passwordFlag) {
+            // if (this.passwordFlag) {
                 console.log(index, row)
             // this.form2 = row
             // this.form2.tag += ''
@@ -238,16 +237,16 @@ export default {
             this.form2.date = (row.date+'').replace('T', ' ')
             console.log("form2", this.form2)
             this.dialogFormVisible2 = true
-            } else {
-                this.$message.warning('请点击验证密码按钮验证密码')
-            }
+            // } else {
+            //     this.$message.warning('请点击验证密码按钮验证密码')
+            // }
            
         },
         handleDelete(index, row) {
-            if (this.passwordFlag) { 
+            // if (this.passwordFlag) { 
                 console.log(index, row);
             let id = parseInt(row.id)
-            axios({
+            this.$axios({
                 url: `/api/admin/memo?id=${id}`,
                 method: 'delete',
             }).then(res => {
@@ -257,21 +256,21 @@ export default {
                     this.$message.success('删除成功')
 
                 } else {
-                    this.$message.error('删除失败！')
+                    this.$message.error('请先登录再进行删除!')
                 }
             })
-            } else {
-                this.$message.warning('请点击验证密码按钮验证密码')
-            }
+            // } else {
+            //     this.$message.warning('请点击验证密码按钮验证密码')
+            // }
            
         },
         showaddform() {
-            if (this.passwordFlag) {
+            // if (this.passwordFlag) {
                 this.form.date = this.date
                 this.dialogFormVisible = true
-            } else {
-                this.$message.warning('请点击验证密码按钮验证密码')
-            }
+            // } else {
+            //     this.$message.warning('请点击验证密码按钮验证密码')
+            // }
             
         },
         initMemo() {
@@ -279,8 +278,8 @@ export default {
             this.sendRequestSetMemoList(this.date)
         },
         sendRequestSetMemoList(date) {
-            axios({
-                url: `/api/admin/memo/list/${date}`,
+            this.$axios({
+                url: `/api/user/memo/list/${date}`,
                 method: 'get',
             }).then(res => {
                 if (res.data.code == 1) {
@@ -307,34 +306,34 @@ export default {
             }
 
         },
-        verifyPassword() {
-            this.$prompt('请输入密码', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                inputValidator: (value) => {
-                    return this.password == value;
-                },
-                inputType: 'password',
-                inputErrorMessage: ' ',
-                lockScroll:false
-            }).then(() => {
-                this.$message({
-                    type: 'success',
-                    message: '验证成功'
-                });
-                this.passwordFlag = true
-            }).catch(() => {
-                this.$message({
-                    type: 'error',
-                    message: '密码验证失败'
-                });
-            });
-        }
+        // verifyPassword() {
+        //     this.$prompt('请输入密码', '提示', {
+        //         confirmButtonText: '确定',
+        //         cancelButtonText: '取消',
+        //         inputValidator: (value) => {
+        //             return this.password == value;
+        //         },
+        //         inputType: 'password',
+        //         inputErrorMessage: ' ',
+        //         lockScroll:false
+        //     }).then(() => {
+        //         this.$message({
+        //             type: 'success',
+        //             message: '验证成功'
+        //         });
+        //         this.passwordFlag = true
+        //     }).catch(() => {
+        //         this.$message({
+        //             type: 'error',
+        //             message: '密码验证失败'
+        //         });
+        //     });
+        // }
     }
 };
 </script>
 
-<style>
+<style scoped>
 .box-card-memo {
     position: absolute;
     float: right;

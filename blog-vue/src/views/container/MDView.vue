@@ -43,7 +43,6 @@
 
 <script>
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
-import axios from 'axios'
 import VueMarkdown from 'vue-markdown'
 import 'github-markdown-css/github-markdown.css'
 export default {
@@ -76,7 +75,7 @@ export default {
       //   Notification.error({ title: '错误', message: err })
       //   this.msg = '# 找不到相应的MD文件!!!'
       // });
-      await axios.get('/mymd/' + str).then(response => {
+      await this.$axios.get('/mymd/' + str).then(response => {
         this.msg = response.data
       }).catch(error => {
         console.error('文件读取失败', error)
@@ -91,7 +90,7 @@ export default {
           const visitorId = result.visitorId;
           this.visitorId = visitorId
           console.log(this.visitorId);
-          axios({
+          this.$axios({
             url: `/api/user/article/userLike`,
             method: 'post',
             data: {
@@ -110,7 +109,7 @@ export default {
         });
       });
       var articleTitle = this.$route.params.title
-      axios({
+      this.$axios({
         url: `/api/user/article/articleLike/${articleTitle}`,
         method: 'get',
       }).then(res => {
@@ -127,7 +126,7 @@ export default {
         return;
       }
       this.likeflag = 1
-      axios({
+      this.$axios({
         url: `/api/user/article`,
         method: 'put',
         data: {
@@ -150,7 +149,7 @@ export default {
         return;
       }
       this.loveflag = 1
-      axios({
+      this.$axios({
         url: `/api/user/article`,
         method: 'put',
         data: {
@@ -173,7 +172,7 @@ export default {
         return;
       }
       this.smileflag = 1
-      axios({
+      this.$axios({
         url: `/api/user/article`,
         method: 'put',
         data: {
@@ -202,7 +201,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .markdown-body {
   box-sizing: border-box;
   min-width: 200px;

@@ -1,6 +1,6 @@
 <template>
     <div style="text-align: left;">
-        <h1 style="color: black;text-align: center;">编辑文章&nbsp;&nbsp;&nbsp;&nbsp;{{title}}</h1>
+        <h1 style="color: black;text-align: center;margin-top: 0px;">编辑文章&nbsp;&nbsp;&nbsp;&nbsp;{{title}}</h1>
         <br>
         <MdEditor v-if="initSuccess" :content="text" :title="title"></MdEditor>
 
@@ -8,7 +8,6 @@
 </template>
 
 <script>
-    import axios from 'axios'
     export default {
 
         data() {
@@ -30,7 +29,7 @@
                 this.title = this.$route.params.title
                 if (str != null && str != '') {
                     str += '.md'
-                    await axios.get('/mymd/' + str)
+                    await this.$axios.get('/mymd/' + str)
                         .then(response => {
                             this.text = response.data;
                         })
@@ -45,5 +44,5 @@
     }
 </script>
 
-<style>
+<style scoped>
 </style>

@@ -1,6 +1,5 @@
 <template>
     <div>
-        <h1 style="color: black;">分类管理</h1>
         <div style="margin: auto;width: 50%">
             <div style="float: right;">
                 <el-button @click="handleAddCategory" style="margin-bottom: 10px;">添加</el-button>
@@ -88,7 +87,6 @@
 </template>
 
 <script>
-    import axios from 'axios'
     export default {
 
         data() {
@@ -112,14 +110,14 @@
                 },
             }
         },
-        created() {
+        mounted() {
             console.log('获取全部分类信息');
             this.getCategoryList()
 
         },
         methods: {
             updateCategory() {
-                axios({
+                this.$axios({
                     url: `/api/admin/category`,
                     method: 'put',
                     data: {
@@ -136,11 +134,12 @@
                     } else {
                         this.$message.error(res.data.msg)
                     }
+                    location.reload();
                 })
                 this.dialogFormVisible = false
             },
             addCategory() {
-                axios({
+                this.$axios({
                     url: `/api/admin/category`,
                     method: 'post',
                     data: {
@@ -154,6 +153,7 @@
                         this.dialogFormVisible2 = false
                     }
                 })
+                location.reload();
             },
             handleAddCategory() {
                 this.dialogFormVisible2 = true
@@ -175,7 +175,7 @@
                     type: 'warning'
                 }).then(() => {
                     console.log('删除id:', row.id);
-                    axios.delete('/api/admin/category', {
+                    this.$axios.delete('/api/admin/category', {
                         params: {
                             id: row.id,
                         }
@@ -204,9 +204,10 @@
                         message: '已取消删除'
                     });
                 });
+                location.reload();
             },
             getCategoryList() {
-                axios({
+                this.$axios({
                     url: '/api/admin/category/list',
                     method: 'get',
                 }).then(res => {
@@ -221,5 +222,5 @@
     }
 </script>
 
-<style>
+<style scoped>
 </style>

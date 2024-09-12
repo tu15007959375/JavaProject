@@ -8,16 +8,22 @@ import com.mblog.enums.BusinessType;
 import com.mblog.result.PageResult;
 import com.mblog.result.Result;
 import com.mblog.service.ArticleService;
+import com.mblog.vo.BaseInfoVO;
 import com.mblog.vo.UserLikeVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotBlank;
 import java.util.List;
+
+import static com.mblog.utils.ConstUtils.ARTICLE_TITLE_NOT_BLANK;
 
 @RestController("userArticleController")
 @RequestMapping("/user/article")
 @Slf4j
+@Validated
 public class ArticleController {
 
     @Autowired
@@ -28,21 +34,9 @@ public class ArticleController {
      * @return
      */
     @GetMapping({"/list/{categoryName}","/list"})
-    public Result<PageResult> getArticlesByCategoryNameAndPage(@PathVariable(required = false) String categoryName, @RequestParam Integer pageSize, @RequestParam Integer currentPage, @RequestParam Integer order ){
-        log.info("根据分类名称和每页大小以及第几页获取文章信息,排序:{},{},{},{}",categoryName,pageSize,currentPage,order);
-        PageResult pageResult  = articleService.getArticlesByCategoryNameAndPage(categoryName,pageSize,currentPage,order);
-        return Result.success(pageResult);
-    }
-
-    /**
-     * 根据搜索内容获取文章信息
-     * @param searchValue
-     * @return
-     */
-    @GetMapping("/search/{searchValue}")
-    public Result<PageResult> getArticlesBySearch(@PathVariable String searchValue,@RequestParam Integer pageSize,@RequestParam Integer currentPage){
-        log.info("搜索：{},{},{}",searchValue,pageSize,currentPage);
-        PageResult pageResult = articleService.getArticlesBySearch(searchValue,pageSize,currentPage);
+    public Result<PageResult> getArticlesByCategoryNameAndPage(@PathVariable(required = false) String categoryName, @RequestParam Integer pageSize, @RequestParam Integer currentPage, @RequestParam Integer order,@RequestParam String searchValue){
+        log.info("根据分类名称和每页大小以及第几页获取文章信息,排序:{},{},{},{},搜索值:{}",categoryName,pageSize,currentPage,order,searchValue);
+        PageResult pageResult  = articleService.getArticlesByCategoryNameAndPage(categoryName,pageSize,currentPage,order,searchValue);
         return Result.success(pageResult);
     }
 
@@ -52,22 +46,22 @@ public class ArticleController {
      * @return
      */
     @GetMapping("/title/{articleTitle}")
-    public Result<Article> getArticleByTitle(@PathVariable String articleTitle){
+    public Result<Article> getArticleByTitle(@PathVariable @NotBlank(message = ARTICLE_TITLE_NOT_BLANK) String articleTitle){
         log.info("根据title获取文章信息:{}",articleTitle);
         Article article = articleService.getArticleByTitle(articleTitle);
         return Result.success(article);
     }
 
     /**
-     * 根据开始和结束时间获取区域内的每天文章数量
+     * 根据开始和结束时间获取区域内的每周文章数量
      * @param beginTime
      * @param endTime
      * @return
      */
-    @GetMapping("/date")
-    public Result<List<Integer>> getEverydayCountsByTime(@RequestParam String beginTime,@RequestParam String endTime){
-        log.info("根据开始和结束时间获取区域内的每天文章数量:{},{}",beginTime,endTime);
-        List<Integer> countsList = articleService.getEverydayCountsByTime(beginTime,endTime);
+    @GetMapping("/dateList")
+    public Result<List<Integer>> getEveryMonthCountsByTime(@RequestParam String beginTime, @RequestParam String endTime){
+        log.info("根据开始和结束时间获取区域内的每月文章数量:{},{}",beginTime,endTime);
+        List<Integer> countsList = articleService.getEveryMonthCountsByTime(beginTime,endTime);
         return Result.success(countsList);
     }
 
@@ -106,5 +100,16 @@ public class ArticleController {
         log.info("更新文章和用户点赞信息：{}",userLikeDTO);
         articleService.updateLike(userLikeDTO);
         return Result.success();
+    }
+
+    /**
+     * 获取后台管理系统基本信息
+     * @return
+     */
+    @GetMapping("/baseInfo")
+    public Result<BaseInfoVO> getBaseInfo(){
+        log.info("获取后台管理系统基本信息");
+        BaseInfoVO baseInfoVO = articleService.getBaseInfo();
+        return Result.success(baseInfoVO);
     }
 }

@@ -22,7 +22,7 @@
                     <p style="margin: auto;line-height: 0;margin-top: -100px;height: 50px;font-size: 13px;">吾将上下而求索</p>
                     <!--展示个人信息下的分类信息-->
                     <el-tree style="line-height: normal;margin-top: -35px;" :data="navList" ref="tree"
-                        :default-expand-all="true" highlight-current  node-key="id" @node-click="handleNodeClick">
+                        :default-expand-all="true" highlight-current node-key="id" @node-click="handleNodeClick">
                         <template v-slot="{ node }">
                             <span v-if="isSelect(node.data.name)"
                                 style="font-size: 15px;font-weight:bold;color: black;">{{ node.data.name }} ({{
@@ -35,7 +35,7 @@
             </div>
             <div style="line-height: normal;margin-left: 12%;font-size: 16px;width: 55%;margin-top: 20px;">
                 <el-card style="text-align: left;margin-bottom: 10px;color:#999;">
-                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;
                     <span class="iconspan" style="cursor: pointer;"
                         @click="changIconSelect(0)">标&nbsp;题&nbsp;名&nbsp;称</span><i class="el-icon-sort-down"></i><i
                         style="margin-left: -7px;" class="el-icon-sort-up"></i>
@@ -57,8 +57,24 @@
                         class="el-icon-sort-down"></i><i style="margin-left: -7px;" class="el-icon-sort-up"></i>
                     &nbsp;|
                 </el-card>
+                <div style="color: #000000;font-size: 16px;margin-top: 20px;margin-bottom: 10px;text-align: left;">
+                    当前分类&nbsp;&nbsp;&nbsp;&nbsp;<i class="el-icon-caret-right"></i>&nbsp;<span
+                        v-if="this.categoryName!= null && this.categoryName !=''"
+                        style="width: 110px;display: inline-block;"><el-tag>{{this.categoryName}}</el-tag></span><span v-else
+                        style="width: 110px;display: inline-block;">
+                       <el-tag>全部</el-tag></span>
+                    <span style="margin-left: 32%;">搜索内容&nbsp;&nbsp;&nbsp;&nbsp;<i class="el-icon-caret-right"></i>&nbsp;
+                        <span v-if="this.searchValue != null && this.searchValue!= ''"
+                            style="width: 110px;display: inline-block;"><el-tag>{{this.searchValue}}</el-tag></span>
+                        <span v-else style="width: 110px;display: inline-block;"><el-tag>空</el-tag></span>
+                        <el-button style="color: black;font-size: 16px;" @click="resetFilter">重置筛选</el-button>
+                    </span>
 
+                </div>
                 <hr class="hr-space-square">
+                <div v-if="this.articleList==null || this.articleList.length == 0" style="color: #000000;font-size: 30px;">
+                    筛选条件内容为空！
+                </div>
             </div>
 
 
@@ -91,7 +107,6 @@
 </template>
 
 <script>
-    import axios from 'axios'
     export default {
         components: {
 
@@ -105,10 +120,10 @@
                 totalSize: -1,
                 backgroundactive: 1,
                 navList: [],
-                isSearch: false,
                 password: '381023',
                 nowSelect: 2,
                 order: 1,
+                categoryName: '',
                 icondown: document.getElementsByClassName('el-icon-sort-down'),
                 iconup: document.getElementsByClassName('el-icon-sort-up')
             }
@@ -125,26 +140,17 @@
         },
         watch: {
             searchValue() {
-                this.isSearch = true
                 this.searchValue = this.$store.state.searchValue
                 console.log("搜索值发生变化，值为:", this.searchValue)
-
-                if (this.searchValue != '') {
-                    this.backgroundactive = false
-                    this.sendSearchRequest(this.searchValue)
-
-                } else {
-                    this.backgroundactive = true
-                    this.isSearch = false
-                    this.getAllArticlesByCategoryNameAndPage(-1, -1)
-                }
+                // this.backgroundactive = true
+                this.getAllArticlesByCategoryNameAndPage(this.pageSize, this.currentPage)
             }
         },
         created() {
             console.log('mainview')
             this.init()
             this.$store.state.categoryName = this.$route.params.categoryName
-            this.getAllArticlesByCategoryNameAndPage(-1, -1)
+            this.getAllArticlesByCategoryNameAndPage(this.pageSize, this.currentPage)
 
         },
         methods: {
@@ -153,27 +159,20 @@
             },
             handleSizeChange(val) {
                 this.pageSize = val
-                if (this.isSearch) {
-                    this.sendSearchRequest(this.searchValue)
-                } else {
-                    this.getAllArticlesByCategoryNameAndPage(this.pageSize, this.currentPage)
-                }
-
+                this.getAllArticlesByCategoryNameAndPage(this.pageSize, this.currentPage)
             },
             handleCurrentChange(val) {
                 this.currentPage = val
                 document.documentElement.scrollTop = 0;
-                if (this.isSearch) {
-                    this.sendSearchRequest(this.searchValue)
-                } else {
-                    this.getAllArticlesByCategoryNameAndPage(this.pageSize, this.currentPage)
-                }
+
+                this.getAllArticlesByCategoryNameAndPage(this.pageSize, this.currentPage)
+
             },
 
             handleNodeClick(data) {
                 // console.log(data.id); // 打印点击节点的 ID
                 // console.log(data)
-                this.isSearch = false
+                this.$store.commit('setSearchValue', '')
                 if (data.children.length == 0) {
                     this.$store.commit('setCategoryId', data.id)
                     this.$store.commit('setCategoryName', data.name)
@@ -182,20 +181,8 @@
                     this.$router.push({ path: `/${data.name}`, })
                 }
             },
-            sendSearchRequest(searchValue) {
-                axios({
-                    url: `/api/user/article/search/${searchValue}?pageSize=${this.pageSize}&currentPage=${this.currentPage}`,
-                    method: 'get',
-                }).then(res => {
-                    if (res.data.code == 1) {
-                        console.log("大小为", res.data.data.total)
-                        this.totalSize = res.data.data.total
-                        this.articleList = res.data.data.records
-                    }
-                })
-            },
             init() {
-                axios({
+                this.$axios({
                     url: '/api/user/category/init',
                     method: 'get',
                 }).then(res => {
@@ -209,6 +196,7 @@
                 document.getElementById("content").scrollIntoView({ behavior: 'smooth' });
             },
             getAllArticlesByCategoryNameAndPage(pageSize, currentPage) {
+                this.categoryName = this.$store.state.categoryName
                 const name = this.$store.state.categoryName
                 const categoryId = this.$store.state.categoryId
                 var urls = '/api/user/article/list/'
@@ -224,9 +212,9 @@
                     urls += `?pageSize=5&currentPage=1`
                 }
                 var noworder = (this.nowSelect + 1) * this.order
-                urls += `&order=${noworder}`
+                urls += `&order=${noworder}&searchValue=${this.searchValue}`
                 console.log('发出get请求', urls)
-                axios({
+                this.$axios({
                     url: urls,
                     method: 'get',
                 }).then(res => {
@@ -286,6 +274,12 @@
                 //todo
                 window.open('tencent://message/?uin=1804694379&Site=&Menu=yes')
             },
+            resetFilter() {
+                this.searchValue = ''
+                this.$store.commit('setCategoryName', '')
+                this.categoryName = ''
+                this.getAllArticlesByCategoryNameAndPage(this.pageSize, this.currentPage)
+            },
             changIconSelect(index) {
                 var iconspan = document.getElementsByClassName('iconspan')
                 iconspan[index].style.color = 'black'
@@ -307,7 +301,7 @@
                     }
                 }
                 this.nowSelect = index;
-                this.getAllArticlesByCategoryNameAndPage(5, 1)
+                this.getAllArticlesByCategoryNameAndPage(this.pageSize, this.currentPage)
             },
         },
         filters: {
@@ -322,7 +316,7 @@
     }
 </script>
 
-<style>
+<style scoped>
     .info {
         position: absolute;
         float: right;

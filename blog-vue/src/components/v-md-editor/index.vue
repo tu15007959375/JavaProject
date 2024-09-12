@@ -31,7 +31,6 @@
 </template>
 
 <script>
-  import axios from 'axios'
   export default {
     name: 'mdEditor',
     data() {
@@ -55,7 +54,7 @@
     },
     created() {
       if (this.title != null && this.title != '') {
-        axios({
+        this.$axios({
           url: `/api/user/article/title/${this.title}`,
           method: 'get',
         }).then(res => {
@@ -71,7 +70,7 @@
       this.categoryNameList = this.$store.state.categoryNameList
       if (this.categoryNameList.length == 0) {
         console.log("未从store获取到categoryNameList");
-        axios({
+        this.$axios({
           url: '/api/user/category/getAllNames',
           method: 'get',
         }).then(res => {
@@ -101,7 +100,7 @@
           return
         }
       
-        axios({
+        this.$axios({
           url: `/api/admin/article`,
           method: 'post',
           data: {
@@ -139,7 +138,7 @@
         for (let i = 0; i < files.length; i++) {
           const formData = new FormData();
           formData.append('file', files[i]);
-          axios.post(`/api/admin/article/uploadImg`, formData, {
+          this.$axios.post(`/api/admin/article/uploadImg`, formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }

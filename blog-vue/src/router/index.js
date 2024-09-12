@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+
 const originalPush = VueRouter.prototype.push
 VueRouter.prototype.push = function push(location) {
   return originalPush.call(this, location).catch(err => err)
@@ -56,6 +57,11 @@ const routes = [
         component: () => import('../views/container/MemoView.vue')
       },
       {
+        path: '/login',
+        name: 'login',
+        component: () => import('../views/container/LoginView.vue')
+      },
+      {
         path: '/:categoryName?',
         name: 'main',
         component: () => import('../views/container/MainView.vue')
@@ -65,6 +71,7 @@ const routes = [
         name: 'mdShow',
         component: () => import('../views/container/MDView.vue')
       }
+
     ]
   },
   {
@@ -76,10 +83,11 @@ const routes = [
     redirect:'/404'
   }
 ]
-
 const router = new VueRouter({
-  mode: 'hash',
+  mode: 'history',
   routes
 })
+
+
 
 export default router

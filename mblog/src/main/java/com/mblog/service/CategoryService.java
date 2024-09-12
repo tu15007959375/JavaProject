@@ -1,7 +1,7 @@
 package com.mblog.service;
 
 import com.mblog.entity.Category;
-import com.mblog.vo.CategoryVo;
+import com.mblog.vo.CategoryVO;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ public interface CategoryService {
      * 返回多级分类嵌套列表
      * @return
      */
-    List<CategoryVo> init();
+    List<CategoryVO> init();
 
     /**
      * 获取所有分类名

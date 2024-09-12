@@ -5,6 +5,7 @@ import com.mblog.dto.UserLikeDTO;
 import com.mblog.entity.Article;
 import com.mblog.entity.ArticleLike;
 import com.mblog.result.PageResult;
+import com.mblog.vo.BaseInfoVO;
 import com.mblog.vo.UserLikeVO;
 
 import java.util.List;
@@ -15,14 +16,8 @@ public interface ArticleService {
      * 根据分类名称和每页大小以及第几页获取文章信息
      * @return
      */
-    PageResult getArticlesByCategoryNameAndPage(String categoryName, Integer pageSize, Integer currentPage,Integer order);
+    PageResult getArticlesByCategoryNameAndPage(String categoryName, Integer pageSize, Integer currentPage,Integer order,String searchValue);
 
-    /**
-     * 根据搜索内容获取文章信息
-     * @param searchValue
-     * @return
-     */
-    PageResult getArticlesBySearch(String searchValue,Integer pageSize,Integer currentPag);
 
     /**
      * 删除指定id的文章，数据库和文件夹中同时删除
@@ -65,8 +60,7 @@ public interface ArticleService {
      * @param endTime
      * @return
      */
-    //Todo 根据时间区间获取文章的数量
-    List<Integer> getEverydayCountsByTime(String beginTime, String endTime);
+    List<Integer> getEveryMonthCountsByTime(String beginTime, String endTime);
 
     /**
      * 获取文章的点赞相关信息
@@ -87,4 +81,10 @@ public interface ArticleService {
      * @return
      */
     UserLikeVO getUserLike(UserLikeDTO userLikeDTO);
+
+    /**
+     * 获取后台管理系统基本信息
+     * @return
+     */
+    BaseInfoVO getBaseInfo();
 }

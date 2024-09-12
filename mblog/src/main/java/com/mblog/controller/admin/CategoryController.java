@@ -7,14 +7,17 @@ import com.mblog.result.Result;
 import com.mblog.service.CategoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Min;
 import java.util.List;
 
 
 @RestController("adminCategoryController")
 @RequestMapping("/admin/category")
 @Slf4j
+@Validated
 public class CategoryController {
     @Autowired
     private CategoryService categoryService;
@@ -33,7 +36,7 @@ public class CategoryController {
      */
     @Log(operation = "根据id修改分类信息",businessType = BusinessType.UPDATE)
     @PutMapping
-    public Result update(@RequestBody Category category){
+    public Result update(@RequestBody @Validated Category category){
         log.info("修改分类:{}",category);
         categoryService.update(category);
         return Result.success();
@@ -46,7 +49,7 @@ public class CategoryController {
      */
     @Log(operation = "根据id删除分类",businessType = BusinessType.DELETE)
     @DeleteMapping
-    public Result deleteByID(@RequestParam Integer id){
+    public Result deleteByID(@RequestParam @Min(1)Integer id){
         log.info("删除分类:{}",id);
         categoryService.deleteById(id);
         return Result.success();
@@ -59,7 +62,7 @@ public class CategoryController {
      */
     @Log(operation = "新增分类",businessType = BusinessType.INSERT)
     @PostMapping
-    public Result save(@RequestBody Category category){
+    public Result save(@RequestBody @Validated Category category){
         log.info("添加分类:{}",category);
         categoryService.save(category);
         return Result.success();
